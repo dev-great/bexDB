@@ -9,7 +9,7 @@ urlpatterns = [
     path('logout/', Logout.as_view()),
     path('changepassword/', ChangePasswordView.as_view()),
     path('password_reset/', include('django_rest_passwordreset.urls')),
-
+    path('notifications/', NotificationView.as_view()),
     path('wallet/', WalletDetailView.as_view()),
     path('referral/', ReferralView.as_view()),
     path('deposit/', DepositView.as_view()),
@@ -17,5 +17,8 @@ urlpatterns = [
     path('profile/', ProfileView.as_view()),
     path('trade/', TradeView.as_view()),
     path('transactions/', TransactionsView.as_view()),
+    path('verify/<phone>/', getPhoneNumberRegistered.as_view()),
+    path('otpverify/', OTPView.as_view()), 
+    path('escrow/', EscrowView.as_view()), 
 ]
 # /api/

@@ -1,6 +1,11 @@
+import base64
 from django.shortcuts import render
+import pyotp
 from .models import *
 from .serializers import *
+from datetime import datetime
+from django.conf import settings
+from django.core.mail import send_mail
 from rest_framework import generics
 from rest_framework import status
 from django.contrib.auth.models import User
@@ -201,3 +206,96 @@ class DepositView(APIView):
         deposit = Deposit.objects.filter(user=user)
         serializer = Depositserializer(deposit, many=True)
         return Response(serializer.data)
+
+class NotificationView(APIView):
+    permission_classes = [IsAuthenticated, ]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get(self, request):
+        username = request.user.username
+        user = User.objects.get(username__exact=username)
+        start_date = user.date_joined
+
+        notifications = NotificationPost.objects.filter(date__gte=start_date)
+        serializer = Notificationserializer(notifications, many = True)
+        return Response(serializer.data)
+
+
+class generateKey:
+    @staticmethod
+    def returnValue(phone):
+        return str(phone) + str(datetime.date(datetime.now())) + "Some Random Secret Key"
+
+
+class getPhoneNumberRegistered(APIView):
+    
+    @staticmethod
+    def get(request, phone):
+        username = request.user.username
+        user = User.objects.get(username__exact=username)
+        user_email = user.email
+        user_nameF = user.first_name
+        user_nameL = user.last_name
+        try:
+            phonenumber = OTPVerification.objects.get(phonenumber=phone)  # if Mobile already exists the take this else create New One
+        except ObjectDoesNotExist:
+            OTPVerification.objects.create(
+                phonenumber=phone,
+            )
+            phonenumber = OTPVerification.objects.get(phonenumber=phone)  # user Newly created Model
+        phonenumber.counter += 1  # Update Counter At every Call
+        phonenumber.save()  # Save the data
+        keygen = generateKey()
+        key = base64.b32encode(keygen.returnValue(phone).encode())  # Key is generated
+        OTP = pyotp.HOTP(key)  # HOTP Model for OTP is created
+        print(OTP.at(phonenumber.counter))
+        msg = f'DO NOT DISCLOSE. Dear {user_nameF} {user_nameL}, The OTP for your confirmation is : {OTP.at(phonenumber.counter)} to verify {phonenumber}. Thank you for choosing BEX.'
+        send_mail('BEX OTP Withdrawal Verification', msg, settings.EMAIL_HOST_USER,
+        [user_email], fail_silently=False)
+        # Using Multi-Threading send the OTP Using Messaging Services like Twilio or Fast2sms
+        return Response({"OTP": OTP.at(phonenumber.counter)}, status=200)  # Just for demonstration
+
+    # This Method verifies the OTP
+    @staticmethod
+    def post(request, phone):
+        try:
+            phonenumber = OTPVerification.objects.get(phonenumber=phone)
+        except ObjectDoesNotExist:
+            return Response("User does not exist", status=404)  # False Call
+        keygen = generateKey()
+        key = base64.b32encode(keygen.returnValue(phone).encode())  # Generating Key
+        OTP = pyotp.HOTP(key)  
+        if OTP.verify(request.data["otp"], phonenumber.counter):  # Verifying the OTP
+            phonenumber.isVerified = True
+            phonenumber.save()
+            return Response("You are authorised", status=200)
+        return Response("OTP is wrong", status=400)
+
+class OTPView(APIView):
+    permission_classes = [IsAuthenticated]
+    csrf_protect_method = method_decorator(csrf_protect)
+
+    def post(self, request):
+        username = request.user.username
+        user = User.objects.get(username__exact=username)
+        serializers = OTPserializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save(user=user)
+            return Response({"error": False})
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+  
+class EscrowView(APIView):
+    permission_classes = [IsAuthenticated]
+    csrf_protect_method = method_decorator(csrf_protect)
+
+    def post(self, request):
+        username = request.user.username
+        user = User.objects.get(username__exact=username)
+        serializers = Escrowserializer(data=request.data)
+        if serializers.is_valid():
+            serializers.save(user=user)
+            return Response({"error": False})
+        return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+ 

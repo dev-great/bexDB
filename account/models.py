@@ -143,3 +143,53 @@ class Transactions(models.Model):
 
     def __str__(self):
         return self.txmode
+
+class NotificationPost(models.Model):
+
+    title = models.CharField(max_length=300)
+    body = models.CharField(max_length=500, blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('-date',)
+
+    def __str__(self):
+        return self.body[:100]
+
+
+class OTPVerification(models.Model):
+    user= models.ForeignKey(User, on_delete=models.CASCADE)
+    phonenumber= models.IntegerField(blank=False)
+    isVerified = models.BooleanField(blank=False, default=False)
+    counter = models.IntegerField(default=0, blank=False)
+    timestamp = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.user.email
+
+class Escrow(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    transactype = models.CharField(max_length=300)
+    fullname =  models.CharField(max_length=300)
+    email = models.CharField(max_length=300)
+    cointobuy = models.CharField(max_length=300)
+    amount = models.CharField(max_length=300)
+    qnt = models.CharField(max_length=300)
+    phonenum = models.CharField(max_length=300)
+    paymentmethod = models.CharField(max_length=300)
+    payselectcoin = models.CharField(max_length=100, default='', blank=True)
+    paywalletadd = models.CharField(max_length=100, default='', blank=True)
+    paybankname = models.CharField(max_length=100, default='', blank=True)
+    payaccname = models.CharField(max_length=100, default='', blank=True)
+    payaccnum = models.CharField(max_length=100, default='', blank=True)
+    receivingmethod = models.CharField(max_length=300)
+    receiveselectcoin = models.CharField(max_length=100, default='', blank=True)
+    receivewalletadd = models.CharField(max_length=100, default='', blank=True)
+    receivebankname = models.CharField(max_length=100, default='', blank=True)
+    receiveaccname = models.CharField(max_length=100, default='', blank=True)
+    receiveaccnum = models.CharField(max_length=100, default='', blank=True)
+    termsncondition = models.BooleanField(default=True)
+    timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user.username

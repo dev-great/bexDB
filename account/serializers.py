@@ -130,3 +130,19 @@ class Transactionsserializer(serializers.ModelSerializer):
     class Meta:
         model = Transactions
         fields = '__all__'
+
+class Notificationserializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationPost
+        fields = '__all__'
+    
+class OTPserializer(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
+    class Meta:
+        model = OTPVerification
+        fields= '__all__'
+
+class Escrowserializer(serializers.ModelSerializer):
+    class Meta:
+        model = Escrow
+        fields= '__all__'

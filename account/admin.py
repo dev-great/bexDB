@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ReferralCode, Referral, Wallet, Deposit, Withdrawal, Profile, Trade, Transactions
+from .models import Escrow, NotificationPost, OTPVerification, ReferralCode, Referral, Wallet, Deposit, Withdrawal, Profile, Trade, Transactions
 # Register your models here.
 class ReferralCodeAdmin(admin. ModelAdmin):
     list_display = ("user", "code")
@@ -52,3 +52,30 @@ class TransactionsAdmin(admin. ModelAdmin):
     search_fields = ("user", "txmode","amount", "txid","timestamp","status")
 
 admin.site.register(Transactions, TransactionsAdmin)
+
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'date', ]
+    list_per_number = 50
+    list_filter = ['title', 'date', ]
+    search_fields = ['title', 'date']
+
+
+admin.site.register(NotificationPost, NotificationAdmin)
+
+class OTPVerificationAdmin(admin.ModelAdmin):
+    list_display = ['user','phonenumber', 'isVerified', 'timestamp']
+    list_per_number = 50
+    list_filter = ['user','phonenumber',]
+    search_fields = ['user','phonenumber',]
+
+
+admin.site.register(OTPVerification, OTPVerificationAdmin)
+
+
+
+class EscrowAdmin(admin. ModelAdmin):
+    list_display = ("user", "transactype", "amount", "qnt","cointobuy","paymentmethod", "receivingmethod")
+    list_filter = ("user", "transactype", "amount", "qnt","cointobuy","paymentmethod", "receivingmethod")
+    search_fields = ("user", "transactype", "amount", "qnt","cointobuy","paymentmethod", "receivingmethod")
+
+admin.site.register(Escrow, EscrowAdmin)
