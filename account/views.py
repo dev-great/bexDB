@@ -298,4 +298,17 @@ class EscrowView(APIView):
             return Response({"error": False})
         return Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def get_serializer_class(self):
+        return Escrowserializer
+
+    def get(self, request):
+
+        username = request.user.username
+        user = User.objects.get(username__exact=username)
+        detail = user.username
+
+        escrow = Escrow.objects.filter(user=user)
+        serializer = Escrowserializer(escrow, many=True)
+        return Response(serializer.data)
+
  
