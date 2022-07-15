@@ -1,3 +1,4 @@
+import email
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -18,5 +19,5 @@ def create_user_wallet(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def create_user_wallet(sender, instance, created, **kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.create(user=instance, firstname = instance.first_name, lastname = instance.last_name, email = instance.email )
 
