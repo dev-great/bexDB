@@ -171,7 +171,7 @@ class OTPVerification(models.Model):
         return self.user.email
 
 class Escrow(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,default=None )
     transactype = models.CharField(max_length=300)
     fullname =  models.CharField(max_length=300)
     email = models.CharField(max_length=300)
