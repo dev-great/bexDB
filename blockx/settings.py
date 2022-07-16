@@ -162,7 +162,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+ACCOUNT_EMAIL_VERIFICATION = "none"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.mail.yahoo.com'
 EMAIL_PORT = 465
