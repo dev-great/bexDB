@@ -13,7 +13,7 @@ def create_referral_code(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def create_user_wallet(sender, instance, created, **kwargs):
     if created:
-        Wallet.objects.create(user=instance, credits=20)
+        Wallet.objects.create(user=instance, credits=0)
 
 
 @receiver(post_save, sender=User)

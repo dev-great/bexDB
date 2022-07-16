@@ -37,6 +37,16 @@ class Referral(models.Model):
     referred_to = models.OneToOneField(User, on_delete=models.DO_NOTHING, related_query_name='has_referred')
 
 
+@ receiver(post_save, sender=Referral)
+def create_referral(sender, instance, *args, **kwargs):
+    if instance:
+       if instance: user_obj = Wallet.objects.get(id=instance.referred_by.id) 
+    new= user_obj.credits + 2
+    user_obj.credits= new
+    user_obj.save()
+
+
+
 class Wallet(models.Model):
     user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     credits = models.FloatField(default=0.0)
