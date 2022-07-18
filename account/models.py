@@ -137,14 +137,7 @@ class Trade(models.Model):
 
     def __str__(self):
         return self.tradingpair
-     
-@ receiver(post_save, sender=Trade)
-def create_profit(sender, instance, created, **kwargs):
-    if instance:
-        user_obj = Wallet.objects.get(user=instance.user)  
-        new = user_obj.credits + (instance.amount *1.12/100)
-        user_obj.credits= new
-        user_obj.save()
+
    
 class Transactions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -156,6 +149,17 @@ class Transactions(models.Model):
 
     def __str__(self):
         return self.txmode
+    
+@ receiver(post_save, sender=Transactions)
+def create_profit(sender, instance, created, **kwargs):
+    if instance:
+        user_obj = Wallet.objects.get(user=instance.user)
+        if  instance.txmode == "withdrawal": 
+            new = user_obj.credits - (instance.amount)
+        else:
+            new = user_obj.credits
+        user_obj.credits= new
+        user_obj.save()
 
 class NotificationPost(models.Model):
 
